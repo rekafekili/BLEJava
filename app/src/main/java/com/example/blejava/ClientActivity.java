@@ -291,15 +291,26 @@ public class ClientActivity extends AppCompatActivity implements View.OnClickLis
             Log.d(TAG, "Success Write : " + characteristic.getStringValue(0));
         }
 
+        @Override
+        public void onCharacteristicRead(BluetoothGatt gatt, BluetoothGattCharacteristic characteristic, int status) {
+            super.onCharacteristicRead(gatt, characteristic, status);
+
+            Log.d(TAG, "Success Status : " + status);
+            Log.d(TAG, "Success Read : " + characteristic.getStringValue(0));
+        }
+
         // When Server send a message, we can received data from it
         @Override
         public void onCharacteristicChanged(BluetoothGatt gatt, BluetoothGattCharacteristic characteristic) {
             super.onCharacteristicChanged(gatt, characteristic);
+            Log.d(TAG, "onCharacteristicChanged : " + characteristic.toString());
 
             byte[] messageBytes = characteristic.getValue();
+
             String messageString;
             messageString = new String(messageBytes, StandardCharsets.UTF_8);
             Log.d(TAG, "Received Message : " + messageString);
+            Log.d(TAG, "Received Message : " + characteristic.getStringValue(0));
         }
 
         private void disconnectGattServer() {
