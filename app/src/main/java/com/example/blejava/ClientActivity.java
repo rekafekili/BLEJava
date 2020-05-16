@@ -8,6 +8,7 @@ import android.bluetooth.BluetoothDevice;
 import android.bluetooth.BluetoothGatt;
 import android.bluetooth.BluetoothGattCallback;
 import android.bluetooth.BluetoothGattCharacteristic;
+import android.bluetooth.BluetoothGattDescriptor;
 import android.bluetooth.BluetoothGattService;
 import android.bluetooth.BluetoothManager;
 import android.bluetooth.BluetoothProfile;
@@ -186,9 +187,10 @@ public class ClientActivity extends AppCompatActivity implements View.OnClickLis
         BluetoothGattService service = mGatt.getService(SERVICE_UUID);
         BluetoothGattCharacteristic characteristic = service.getCharacteristic(CHARACTERISTIC_UUID);
         String message = mSendingEditText.getText().toString();
+        mSendingEditText.setText("");
 
         // In order to send the data we must first convert out String to byte[]
-        byte[] messageBytes = new byte[0];
+        byte[] messageBytes;
         messageBytes = message.getBytes(StandardCharsets.UTF_8);
 
         characteristic.setValue(messageBytes);
@@ -277,9 +279,11 @@ public class ClientActivity extends AppCompatActivity implements View.OnClickLis
             Log.d(TAG, "Bluetooth GATT Service : " + service.toString());
             BluetoothGattCharacteristic characteristic = service.getCharacteristic(CHARACTERISTIC_UUID);
             Log.d(TAG, "Bluetooth GATT Char : " + characteristic.toString());
+            Log.d(TAG, "Bluetooth GATT Properties : " + characteristic.getProperties());
 
             characteristic.setWriteType(BluetoothGattCharacteristic.WRITE_TYPE_DEFAULT);
             mInitialized = gatt.setCharacteristicNotification(characteristic, true);
+//            mGatt.readCharacteristic(characteristic);
             Log.d(TAG, "Initialized : " + mInitialized);
         }
 
@@ -287,7 +291,7 @@ public class ClientActivity extends AppCompatActivity implements View.OnClickLis
         public void onCharacteristicWrite(BluetoothGatt gatt, BluetoothGattCharacteristic characteristic, int status) {
             super.onCharacteristicWrite(gatt, characteristic, status);
 
-            Log.d(TAG, "Success Status : " + status);
+            Log.d(TAG, "Success Status in Write : " + status);
             Log.d(TAG, "Success Write : " + characteristic.getStringValue(0));
         }
 
@@ -295,7 +299,7 @@ public class ClientActivity extends AppCompatActivity implements View.OnClickLis
         public void onCharacteristicRead(BluetoothGatt gatt, BluetoothGattCharacteristic characteristic, int status) {
             super.onCharacteristicRead(gatt, characteristic, status);
 
-            Log.d(TAG, "Success Status : " + status);
+            Log.d(TAG, "Success Status in Read : " + status);
             Log.d(TAG, "Success Read : " + characteristic.getStringValue(0));
         }
 
