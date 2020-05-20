@@ -283,7 +283,17 @@ public class ClientActivity extends AppCompatActivity implements View.OnClickLis
 
             characteristic.setWriteType(BluetoothGattCharacteristic.WRITE_TYPE_DEFAULT);
             mInitialized = gatt.setCharacteristicNotification(characteristic, true);
-//            mGatt.readCharacteristic(characteristic);
+
+            new Thread(() -> {
+                while(true) {
+                    try {
+                        Thread.sleep(3000);
+                        mGatt.readCharacteristic(characteristic);
+                    } catch (InterruptedException e) {
+                        e.printStackTrace();
+                    }
+                }
+            }).start();
             Log.d(TAG, "Initialized : " + mInitialized);
         }
 
@@ -301,6 +311,8 @@ public class ClientActivity extends AppCompatActivity implements View.OnClickLis
 
             Log.d(TAG, "Success Status in Read : " + status);
             Log.d(TAG, "Success Read : " + characteristic.getStringValue(0));
+            characteristic.setValue((String) null);
+            mGatt.writeCharacteristic(characteristic);
         }
 
         // When Server send a message, we can received data from it
