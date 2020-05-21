@@ -21,13 +21,11 @@ import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.os.Bundle;
 import android.os.Handler;
-import android.os.ParcelUuid;
 import android.util.Log;
 import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
 
-import java.io.UnsupportedEncodingException;
 import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -66,14 +64,14 @@ public class ClientActivity extends AppCompatActivity implements View.OnClickLis
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_client);
 
-        viewBining();
+        viewBinding();
 
         // 기본적인 BLE 동작을 할 수 있도록 도와주는 BluetoothAdapter를 생성한다.
         BluetoothManager bluetoothManager = (BluetoothManager) getSystemService(BLUETOOTH_SERVICE);
         mBluetoothAdapter = bluetoothManager.getAdapter();
     }
 
-    private void viewBining() {
+    private void viewBinding() {
         mStartScanButton = findViewById(R.id.client_start_scan_button);
         mStopScanButton = findViewById(R.id.client_stop_scan_button);
         mConnectButton = findViewById(R.id.client_connect_button);
@@ -284,6 +282,10 @@ public class ClientActivity extends AppCompatActivity implements View.OnClickLis
             characteristic.setWriteType(BluetoothGattCharacteristic.WRITE_TYPE_DEFAULT);
             mInitialized = gatt.setCharacteristicNotification(characteristic, true);
 
+//            BluetoothGattDescriptor descriptor = characteristic.getDescriptor(UUID.fromString("00002902-0000-1000-8000-00805f9b34fb"));
+//            descriptor.setValue(BluetoothGattDescriptor.ENABLE_NOTIFICATION_VALUE);
+//            mGatt.writeDescriptor(descriptor);
+
             new Thread(() -> {
                 while(true) {
                     try {
@@ -311,8 +313,6 @@ public class ClientActivity extends AppCompatActivity implements View.OnClickLis
 
             Log.d(TAG, "Success Status in Read : " + status);
             Log.d(TAG, "Success Read : " + characteristic.getStringValue(0));
-            characteristic.setValue((String) null);
-            mGatt.writeCharacteristic(characteristic);
         }
 
         // When Server send a message, we can received data from it
@@ -320,12 +320,6 @@ public class ClientActivity extends AppCompatActivity implements View.OnClickLis
         public void onCharacteristicChanged(BluetoothGatt gatt, BluetoothGattCharacteristic characteristic) {
             super.onCharacteristicChanged(gatt, characteristic);
             Log.d(TAG, "onCharacteristicChanged : " + characteristic.toString());
-
-            byte[] messageBytes = characteristic.getValue();
-
-            String messageString;
-            messageString = new String(messageBytes, StandardCharsets.UTF_8);
-            Log.d(TAG, "Received Message : " + messageString);
             Log.d(TAG, "Received Message : " + characteristic.getStringValue(0));
         }
 
